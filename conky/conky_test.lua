@@ -161,11 +161,11 @@ labl_cpu={
 	suffix='',
 	name = "exec",
 	arg="lscpu |grep Nom |cut -d \":\" -f2",
-	xpos = 1400,
+	xpos = 1300,
 	ypos = 40,
 
 	font = "DejaVu Sans Mono",
-	font_size = 20,
+	font_size = 19,
 	color = 0xffffff,
 	alpha=1,
 	font_slant=CAIRO_FONT_SLANT_NORMAL,
