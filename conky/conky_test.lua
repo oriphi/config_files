@@ -40,6 +40,7 @@ labl_cpu={
 
 
 CPUS = {
+
 	{
  	name ="cpu",
 	arg="",
@@ -80,6 +81,7 @@ CPUS = {
 		labl_color = 0xffffff,
 		labl_alpha = 1,
 	},
+	--[[
 		{
  	name ="cpu",
 	arg="cpu7",
@@ -120,6 +122,7 @@ CPUS = {
 		labl_color = 0xffffff,
 		labl_alpha = 1,
 	},
+	]]
 	{
 	name ="cpu",
 	arg="cpu1",
@@ -157,16 +160,16 @@ CPUS = {
 	},
 }
 
-CPUS_circle = 
+horloge_circle = {
 	{
- 	name ="cpu",
-	arg="",
-	val_max=100,
-	center_x=1000,
-	center_y=800,
-	start_angle = 15,
-	end_angle = 75,
-	circle_type = "pie",
+ 	name ="time",
+	arg="%H",
+	val_max=24,
+	center_x=300,
+	center_y=300,
+	start_angle = 0,
+	end_angle = 360,
+	circle_type = "fill",
 		front_color = 0xffffff,
 		front_alpha = 0.5,
 		
@@ -175,8 +178,8 @@ CPUS_circle =
 	cursor_alpha = 0.5,
 		
 
-	circle_width=15,
-	radius=500,
+	circle_width=20,
+	radius=120,
 	background='yes',
 		back_color=0x000000,
 		back_alpha=1,
@@ -197,7 +200,88 @@ CPUS_circle =
 		font_size = 10,
 		labl_color = 0xffffff,
 		labl_alpha = 1,
-	}
+	},
+		{
+ 	name ="time",
+	arg="%M",
+	val_max=60,
+	center_x=300,
+	center_y=300,
+	start_angle = 0,
+	end_angle = 360,
+	circle_type = "fill",
+		front_color = 0xffffff,
+		front_alpha = 0.5,
+		
+	cursor_width = 10,
+	cusor_color = 0xffffff,
+	cursor_alpha = 0.5,
+		
+
+	circle_width=20,
+	radius=100,
+	background='yes',
+		back_color=0x000000,
+		back_alpha=1,
+	font_slant=CAIRO_FONT_SLANT_NORMAL,
+	font_face=CAIRO_FONT_WEIGHT_NORMAL,
+	line_cap = CAIRO_LINE_CAP_BUTT,
+	font = "DejaVu Sans Mono",	
+	font_size = 12,
+	labl = "yes",
+		labl_pos = "left", --left,right
+		labl_prefix = '[ ',
+		labl_suffix=' %]',
+		labl_name = "cpu",
+		labl_arg="",
+		labl_deltax = 0,
+		labl_deltay = 3,
+		font = "DejaVu Sans Mono",
+		font_size = 10,
+		labl_color = 0xffffff,
+		labl_alpha = 1,
+	},
+		{
+ 	name ="time",
+	arg="%S",
+	val_max=60,
+	center_x=300,
+	center_y=300,
+	start_angle = 0,
+	end_angle = 360,
+	circle_type = "pie",
+		front_color = 0xffffff,
+		front_alpha = 0.5,
+		
+	cursor_width = 10,
+	cusor_color = 0xffffff,
+	cursor_alpha = 0.5,
+		
+
+	circle_width=20,
+	radius=80,
+	background='yes',
+		back_color=0x000000,
+		back_alpha=0.4,
+	font_slant=CAIRO_FONT_SLANT_NORMAL,
+	font_face=CAIRO_FONT_WEIGHT_NORMAL,
+	line_cap = CAIRO_LINE_CAP_BUTT,
+	font = "DejaVu Sans Mono",	
+	font_size = 12,
+	labl = "yes",
+		labl_pos = "left", --left,right
+		labl_prefix = '[ ',
+		labl_suffix=' %]',
+		labl_name = "cpu",
+		labl_arg="",
+		labl_deltax = 0,
+		labl_deltay = 3,
+		font = "DejaVu Sans Mono",
+		font_size = 10,
+		labl_color = 0xffffff,
+		labl_alpha = 1,
+	},
+}
 --[[
 horloge ={
 	{
@@ -462,7 +546,14 @@ function boucle_labl(display,data)
 		load_labl(display,data[i])
 	end
 end
-
+function boucle_cercle(display,data)
+	local function load_cercle(display,data)
+		affich_cercle(display,data)
+	end
+	for i in pairs(data) do
+		load_cercle(display,data[i])
+	end
+end
 
 function affich_text(cr,data)
 	cairo_select_font_face (cr,data['font'], data['font_slant'], data['font_face'])
@@ -510,6 +601,7 @@ function affich_bar(cr,data)
 			endx = startx - size
 		end
 		endy = starty
+		
 	elseif data["bar_orientation"] == "vertical" then
 		if begin == "up" then 
 			endy = starty + size
@@ -523,12 +615,34 @@ function affich_bar(cr,data)
 	
 	--Draw the background of the gauge
 	if data["background"] == 'yes' then
+		
+		cairo_new_path(cr)
+		cairo_set_line_width (cr,0)
+		cairo_set_line_cap  (cr, line_cap)
+		cairo_set_source_rgba (cr,rgb_to_r_g_b(data["back_color"],data["back_alpha"]))
+		cairo_move_to (cr,startx,starty)
+		cairo_line_to (cr,endx,endy)
+		if data["bar_orientation"] == "horizontal" then
+		
+			cairo_line_to (cr,endx, endy +line_width)
+			cairo_line_to (cr, startx, endy + line_width)
+
+		elseif data["bar_orientation"] == "vertical" then
+			cairo_line_to (cr,endx + line_width, endy )
+			cairo_line_to (cr, startx + line_width, starty )
+
+		end
+		cairo_close_path(cr)
+		cairo_fill_preserve(cr)
+	--cairo_stroke (cr)
+		--[[
 		cairo_set_line_width (cr,line_width)
 		cairo_set_line_cap  (cr, line_cap)
 		cairo_set_source_rgba (cr,rgb_to_r_g_b(data["back_color"],data["back_alpha"]))
 		cairo_move_to (cr,startx,starty)
 		cairo_line_to (cr,endx,endy)
 		cairo_stroke (cr)
+	]]
 	end
 
 	if data["border"] == 'yes' then
@@ -599,13 +713,31 @@ function affich_bar(cr,data)
 		
 
 	end
-
+	cairo_new_path(cr)
+	cairo_set_line_width (cr,0)
+	cairo_set_line_cap  (cr, line_cap)
+	cairo_set_source_rgba (cr,rgb_to_r_g_b(data["front_color"],data["front_alpha"]))
+	cairo_move_to (cr,fillx ,filly)
+	cairo_line_to (cr,end_fillx,end_filly)
+	if data["bar_orientation"] == "horizontal" then
+		cairo_line_to (cr,end_fillx,end_filly + line_width)
+		cairo_line_to (cr,fillx,end_filly + line_width)
+		cairo_close_path(cr)
+	elseif data["bar_orientation"] == "vertical" then
+		cairo_line_to (cr,end_fillx + line_width,end_filly)
+		cairo_line_to (cr,fillx + line_width,filly)
+		cairo_close_path(cr)
+	end
+	--cairo_close_path(cr)
+	cairo_fill_preserve(cr)
+	--[[
 	cairo_set_line_width (cr,line_width)
 	cairo_set_line_cap  (cr, line_cap)
 	cairo_set_source_rgba (cr,rgb_to_r_g_b(data["front_color"],data["front_alpha"]))
 	cairo_move_to (cr,fillx ,filly)
 	cairo_line_to (cr,end_fillx,end_filly)
 	cairo_stroke (cr)
+	]]
 	if data["labl"] == "yes" then
 
 		local labelx,labely = 0,0
@@ -660,7 +792,7 @@ function conky_main()
 		--boucle_labl(cr,gpu_labl)
 		--boucle_labl(cr,horloge)
 		--boucle_labl(cr,divers)
-		affich_cercle(cr,CPUS_circle)
+		boucle_cercle(cr,horloge_circle)
 		---------------------------------------
 
 
