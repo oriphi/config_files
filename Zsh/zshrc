@@ -1,0 +1,82 @@
+# Created by newuser for 5.7.1
+
+export XDG_CONFIG_HOME="/home/pierre/.config"
+
+
+setopt NO_CASE_GLOB
+setopt AUTO_CD
+setopt INC_APPEND_HISTORY
+setopt HIST_VERIFY
+#setopt CORRECT
+#setopt CORRECT_ALL
+setopt PROMPT_SUBST
+
+HISTFILE=~/.histfile SAVEHIST=20000
+HISTSIZE=10000
+
+export VISUAL=nvim
+export EDITOR="$VISUAL"
+
+
+zshrcRefresh() {
+	# $1 = $?
+	# $2 print text
+	source /home/pierre/.zshrc
+	if [ "$?" -eq "0" ];
+	then
+		echo -e "\e[1;32m .zshrc reloaded"
+	else
+		echo -e "\e[1;31m Error while refreshing .zshrc"
+	fi
+
+}
+
+
+bindkey "^[[1~" beginning-of-line
+bindkey "^[[4~" end-of-line
+
+
+
+alias l='ls --color=always'
+alias ls='ls --color=always'
+alias le='less -R'
+alias g='grep --color=never'
+alias gc='grep --color=always'
+alias v='nvim'
+alias pi='ipython -i'
+alias p='ipython'
+alias z='zathura'
+#alias s%='source /home/pierre/.zshrc ; printReturn $?'
+alias s%='zshrcRefresh'
+alias tt='tt++ /home/pierre/.tintin/aardworld.tin'
+alias xc='xclip -selection clipboard'
+alias mp='mpv --audio-display=attachment --geometry="200-40+40" --input-ipc-server=/tmp/mpvsocket --keep-open=yes --force-window'
+alias vpn='openconnect https://sslvpn.ethz.ch/student-net'
+alias sc='cd /tmp/scratch 2>/dev/null  || mkdir /tmp/scratch;cd /tmp/scratch'
+alias fcv='source /home/pierre/Documents/Perso/Programs/Fuzzy/go.sh'
+alias ced="/home/pierre/Scripts/edit.py"
+alias ...="../.."
+alias ca="nocorrect /home/pierre/Scripts/calendar.py"
+alias mpc="nocorrect mpc -p 30000"
+
+
+
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# Auto Completion
+PROMPT2="> "
+
+if [[ "$TERM" == "linux" ]];
+then
+	PROMPT="%B%F{yellow}(%F{green}%n %F{red}[%F{blue}%T%F{red}] [%F{blue}%~%F{red}] Z%F{yellow})"$'\n'" > %f%b"
+	setfont ter-v22n
+	ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=magenta"
+else
+	autoload -Uz compinit
+	compinit
+	#zstyle ':completion:*' menu select
+	ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#a0a0a0"
+
+	PROMPT="%B%F{yellow}(%F{green}%n %F{red}[%F{blue}%T%F{red}] [%F{blue}%~%F{red}] %F{6} Z%F{yellow})"$'\n'"  %F{magenta}◉ %f%b"
+fi
